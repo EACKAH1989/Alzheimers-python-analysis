@@ -67,6 +67,7 @@ import matplotlib.pyplot as plt
 plt.figure()
 sns.lineplot(data=df, x="age", y="mmse", hue="diagnosis")
 plt.title("MMSE decline pattern by diagnosis")
+plt.savefig("Figures/MMSE decline pattern by diagnosis.png", dpi=300, bbox_inches="tight")
 plt.show()
 
 
@@ -126,4 +127,5 @@ top_features.plot(kind="barh")
 plt.title("Top 10 Feature Importance (Permutation)")
 plt.xlabel("Importance")
 plt.tight_layout()
+plt.savefig("Figures/feature_importance.png", dpi=300, bbox_inches="tight")
 plt.show()
