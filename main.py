@@ -68,7 +68,7 @@ plt.figure()
 sns.lineplot(data=df, x="age", y="mmse", hue="diagnosis")
 plt.title("MMSE decline pattern by diagnosis")
 plt.savefig("Figures/MMSE decline pattern by diagnosis.png", dpi=300, bbox_inches="tight")
-plt.show()
+#plt.show()
 
 
 # Encode categorical variables
@@ -128,4 +128,140 @@ plt.title("Top 10 Feature Importance (Permutation)")
 plt.xlabel("Importance")
 plt.tight_layout()
 plt.savefig("Figures/feature_importance.png", dpi=300, bbox_inches="tight")
+#plt.show()
+
+import matplotlib.pyplot as plt
+import seaborn as sns
+
+sns.set_theme(style="white")
+plt.rcParams.update({
+    "font.family": "DejaVu Sans",
+    "font.size": 11,
+    "axes.titlesize": 14,
+    "axes.labelsize": 12,
+    "axes.edgecolor": "black",
+    "axes.linewidth": 0.8,
+    "grid.color": "#E5E5E5",
+    "grid.linestyle": "-",
+    "grid.linewidth": 0.6,
+    "figure.dpi": 300
+})
+
+# Color-blind friendly palette
+COLORS = {
+    "No": "#4C72B0",   # muted blue
+    "Yes": "#DD8452"   # muted orange
+}
+import os
+os.makedirs("Figures", exist_ok=True)
+
+#AGE vs DIAGNOSIS (BOXPLOT)
+plt.figure()
+sns.boxplot(
+    data=df,
+    x="diagnosis",
+    y="age",
+    hue="diagnosis",
+    palette={"No": "#3fb68b", "Yes": "#e05c5c"},
+    legend=False,
+    width=0.5
+)
+plt.title("Age Distribution by Diagnosis")
+plt.xlabel("Diagnosis")
+plt.ylabel("Age")
+plt.savefig("Figures/age_boxplot.png", dpi=300, bbox_inches="tight")
+plt.show()
+
+#MMSE vs DIAGNOSIS (BOXPLOT)
+plt.figure(figsize=(6, 4))
+sns.boxplot(
+    data=df,
+    x="diagnosis",
+    y="mmse",
+    hue="diagnosis",
+    palette=COLORS,
+    width=0.5,
+    fliersize=0,
+    linewidth=1,
+    legend=False
+
+)
+sns.stripplot(
+    data=df,
+    x="diagnosis",
+    y="mmse",
+    color="black",
+    alpha=0.25,
+    size=3
+)
+plt.title("MMSE Scores by Alzheimer’s Diagnosis", pad=10)
+plt.xlabel("")
+plt.ylabel("MMSE Score")
+sns.despine()
+plt.tight_layout()
+plt.savefig("Figures/Figure1_MMSE.png")
+plt.show()
+
+#PREVLAENCE BY AGE GROUP
+prev_df = df.groupby("age_group")["diagnosis"].apply(lambda x: (x == "Yes").mean()).reset_index()
+plt.figure(figsize=(6, 4))
+sns.barplot(
+    data=prev_df,
+    x="age_group",
+    y="diagnosis",
+    color="#4C72B0"
+)
+
+# Confidence intervals removed for clean journal style
+plt.ylabel("Prevalence")
+plt.xlabel("Age Group")
+plt.title("Prevalence of Alzheimer’s Disease by Age Group", pad=10)
+
+# Add % labels
+for i, val in enumerate(prev_df["diagnosis"]):
+    plt.text(i, val + 0.01, f"{val*100:.1f}%", ha="center", fontsize=10)
+sns.despine()
+plt.tight_layout()
+plt.savefig("Figures/Figure3_Prevalence.png")
+plt.show()
+
+#ROC Curve
+from sklearn.metrics import roc_curve
+
+fpr, tpr, _ = roc_curve(y_test, y_prob)
+
+plt.figure(figsize=(5, 5))
+
+plt.plot(fpr, tpr, linewidth=2, label=f"AUC = {auc:.2f}")
+plt.plot([0, 1], [0, 1], linestyle="--", linewidth=1)
+
+plt.xlabel("False Positive Rate")
+plt.ylabel("True Positive Rate")
+plt.title("ROC Curve")
+
+plt.legend(frameon=False)
+
+sns.despine()
+plt.tight_layout()
+plt.savefig("Figures/Figure4_ROC.png")
+plt.show()
+
+#Feature Importance
+top_features = importances.sort_values(ascending=False).head(10)
+
+plt.figure(figsize=(6, 4))
+
+sns.barplot(
+    x=top_features.values,
+    y=top_features.index,
+    color="#4C72B0"
+)
+
+plt.xlabel("Permutation Importance")
+plt.ylabel("")
+plt.title("Top Predictors of Alzheimer’s Diagnosis", pad=10)
+
+sns.despine()
+plt.tight_layout()
+plt.savefig("Figures/Figure5_Features.png")
 plt.show()
